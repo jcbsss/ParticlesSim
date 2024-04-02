@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "gcc",
+            "args": [
+                "-o",
+                "ParticleSim",
+                "main.c",
+                "additionalFunctions.c"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "files.associations": {
+        "additionalfunctions.h": "c"
+    }
+}
