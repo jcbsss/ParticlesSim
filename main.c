@@ -8,7 +8,7 @@
 
 main() {
   /*Simulation Parameters*/
-    double end_time = 1.5; //Choose the duration
+    double end_time = 10.5; //Choose the duration
     double dt = 0.05; //Choose the timestep
     int time_steps = end_time/dt; // The number of time steps
 
@@ -23,8 +23,8 @@ main() {
     double* y1 = allocateDoubleArray(time_steps); //Particle's coordinates allocation
     double* y2 = allocateDoubleArray(time_steps);
     *y1 = 1; //Defining of the particle's initial coordinates //Need some cool algorithm to place it randomly or uniformly
-    *y2 = 1;
-    double v1=0.3, v2=0.6, a1=0.1, a2=0; //Defining of the particle's initial speeds and accelerations //usually 0
+    *y2 = 0;
+    double v1=0.1, v2=0., a1=2., a2=0.; //Defining of the particle's initial speeds and accelerations //usually 0
 
   /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function
     for (int i = 0; i < time_steps; ++i)
@@ -39,29 +39,7 @@ main() {
       a2 = A*(U-v2 + W); //real formula, this is incomplete. You need some maths, I guess
     }
 
-
-      //printf("y1 = %lf y2 = %lf  v1 = %lf v2 = %lf   a1 = %lf a2 = %lf \n", *(y1 + i), *(y2 + i), v1, v2, a1, a2); //Optional printing
-      /*You can put it into some function. CHECK IT*/
-      // Open the file for writing
-    FILE *file = fopen("positions_sParticleSim.csv", "w");
-    if (file == NULL) {
-        printf("Error opening file!\n");
-        return 1;
-    }
-
-    // Write the header row
-    fprintf(file, "time[s],y1[m],y2[m]\n");
-
-    // Write the data rows
-    for (int i = 0; i < time_steps; i++) {
-        fprintf(file, "%.3f,%.6f,%.6f\n", i*dt, *(y1+i), *(y1+i));
-    }
-
-    // Close the file
-    fclose(file);
-
-    printf("Data written to positions_ParticleSim.csv\n");
-    
+    writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
 
     free(y1);
     free(y2);
