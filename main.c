@@ -1,4 +1,4 @@
-/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c; ./ParticleSim */
+/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm; ./ParticleSim */
 //#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>

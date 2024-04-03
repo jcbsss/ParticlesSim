@@ -27,5 +27,5 @@ void writeDataToFile(const char *filename, int time_steps, double dt, double *y1
     // Close the file
     fclose(file);
 
-    printf("Data written to %s\n", filename);
+    printf("Data written to %s\n\n", filename);
 }
