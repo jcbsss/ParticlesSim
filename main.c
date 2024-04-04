@@ -6,16 +6,6 @@
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
-/*Simple function to initialize initial positions*/
-void initialize_positions(double** y1, double** y2, int N, double L1, double L2) {
-    double dx = L1 / (N - 1); // Spacing along the x-axis
-    double dy = L2 / (N - 1); // Spacing along the y-axis
-
-    for (int i = 0; i < N; i++) {
-        y1[i][0] = i * dx;
-        y2[i][0] = i * dy;
-    }
-} 
 
 main() {
    /*Flow parameters*/
@@ -37,7 +27,7 @@ main() {
     double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
     double* y2_row = allocateDoubleArray(N*time_steps);
     double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
-    initialize_positions(y1, y2, N, L1, L2);
+    initialize_positions(y1, y2, N, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
 
   /*Defining particles' initial velocities and accelerations*/
     double* v1 = allocateDoubleArray(N); //Defining of the particle's initial speeds and accelerations 
@@ -69,7 +59,7 @@ main() {
     printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
 
     /*Write the positions to file*/
-    writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
+    writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);
 
     /*Clear the space*/
     free(y1); free(y2);

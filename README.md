@@ -8,3 +8,8 @@ Additional task is to optimize the code and use paralelization. I'm still learni
 
 2/2 MILESTONE 2/2
 This is my main part of a programme where I extend the basic simulation from 1 particle to miltiple particles. It is supposed to be optimized and parallelized.
+
+Remarks
+IMPROVE: initial positions function
+EDIT: matlab code
+ADD and RETHINK: some statistical functionalities
