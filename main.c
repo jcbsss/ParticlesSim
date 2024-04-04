@@ -6,7 +6,6 @@
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
-
 main() {
    /*Flow parameters*/
     double A=5; //Inertia parameter
@@ -50,7 +49,7 @@ main() {
 
 
     /*Write to file the positions*/
-    writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
+    writeDataToFile("positions_SingleParticleSim.csv",time_steps,dt,y1,y2);
     /*Clear the space*/
     free(y1);
     free(y2);
