@@ -23,14 +23,14 @@ main() {
     double W=0.5; //Settling velocity parameter
     double U_0=1.5; //[m/s] //Max flow speed
     double R=0.3; //Mass ration
-    double L1=2*PI, L2=4*PI; //[m] //Domain size
+    double L1=2*PI, L2=2*PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time = 5; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time = 15; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.01; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 15; //The number of particles
+    int N = 16; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
@@ -69,17 +69,13 @@ main() {
     printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
 
     /*Write the positions to file*/
-    //writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
+    writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
 
     /*Clear the space*/
-    free(y1);
-    free(y1_row);
-    free(y2);
-    free(y2_row);
-    free(v1);
-    free(v2);
-    free(a1);
-    free(a2);
+    free(y1); free(y2);
+    free(y1_row); free(y2_row);
+    free(v1); free(v2);
+    free(a1); free(a2);
 
     return 0;
 }
