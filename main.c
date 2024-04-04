@@ -6,6 +6,16 @@
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
+/*Simple function to initialize initial positions*/
+void initialize_positions(double** y1, double** y2, int N, double L1, double L2) {
+    double dx = L1 / (N - 1); // Spacing along the x-axis
+    double dy = L2 / (N - 1); // Spacing along the y-axis
+
+    for (int i = 0; i < N; i++) {
+        y1[i][0] = i * dx;
+        y2[i][0] = i * dy;
+    }
+} 
 
 main() {
    /*Flow parameters*/
@@ -16,43 +26,60 @@ main() {
     double L1=2*PI, L2=4*PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time = 50; //Choose the duration //Don't choose it to long, because the file will be huge
-    double dt =0.01; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
+    double end_time = 5; //Choose the duration //Don't choose it to long, because the file will be huge
+    double dt = 0.01; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
+    int N = 15; //The number of particles
 
- /*Defining particle's coordinates and movement*/
-    double* y1 = allocateDoubleArray(time_steps); //Particle's coordinates allocation
-    double* y2 = allocateDoubleArray(time_steps);
-    *y1 = 1; //Defining of the particle's initial coordinates //Need some cool algorithm to place it randomly or uniformly
-    *y2 = 1;
-    double v1=0., v2=0., a1=0., a2=0.; //Defining of the particle's initial speeds and accelerations //usually 0
+  /*Defining particles' initial coordinates*/
+    double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
+    double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
+    double* y2_row = allocateDoubleArray(N*time_steps);
+    double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
+    initialize_positions(y1, y2, N, L1, L2);
 
-  /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function
-    for (int i = 0; i < time_steps; ++i)
+  /*Defining particles' initial velocities and accelerations*/
+    double* v1 = allocateDoubleArray(N); //Defining of the particle's initial speeds and accelerations 
+    double* v2 = allocateDoubleArray(N); //calloc function already initialized 0 values everywhere
+    double* a1 = allocateDoubleArray(N);
+    double* a2 = allocateDoubleArray(N);
+
+  /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function (?)
+    for (int i = 0; i < time_steps; ++i) //iterate over each timestep
     {
-      y1[i+1] = y1[i] + v1*dt;
-      y2[i+1] = y2[i] + v2*dt;
+      for (int j = 0; j < N; ++j) //iterate over each particle
+      {  
+        y1[j][i+1] = y1[j][i] + v1[j]*dt;
+        y2[j][i+1] = y2[j][i] + v2[j]*dt;
 
-      v1 = v1 + a1*dt;
-      v2 = v2 + a2*dt;
+        v1[j] = v1[j] + a1[j]*dt;
+        v2[j] = v2[j] + a2[j]*dt;
 
-      a1 = A*(U_0*sin(y1[i+1])*cos(y2[i+1])-v1);
-      a2 = A*(-U_0*cos(y1[i+1])*sin(y2[i+1])-v2 + W);
+        a1[j] = A*(U_0*sin(y1[j][i+1])*cos(y2[j][i+1])-v1[j]);
+        a2[j] = A*(-U_0*cos(y1[j][i+1])*sin(y2[j][i+1])-v2[j] + W);
 
-      if (y1[i+1]>L1) (y1[i+1]=y1[i+1]-L1);
-      if (y1[i+1]<0) (y1[i+1]=y1[i+1]+L1);
-      if (y2[i+1]>L2) (y2[i+1]=y2[i+1]-L2);
-      if (y2[i+1]<0) (y2[i+1]=y2[i+1]+L2);
+        if (y1[j][i+1] > L1) y1[j][i+1] -= L1; //The functionality of a periodic boundary conditions
+        if (y1[j][i+1] < 0) y1[j][i+1] += L1;
+        if (y2[j][i+1] > L2) y2[j][i+1] -= L2;
+        if (y2[j][i+1] < 0) y2[j][i+1] += L2;
+      }
     }
-    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
 
+    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
 
+    /*Write the positions to file*/
+    //writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
 
-    /*Write to file the positions*/
-    writeDataToFile("positions_ParticleSim.csv",time_steps,dt,y1,y2);
     /*Clear the space*/
     free(y1);
+    free(y1_row);
     free(y2);
+    free(y2_row);
+    free(v1);
+    free(v2);
+    free(a1);
+    free(a2);
+
     return 0;
 }

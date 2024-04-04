@@ -9,6 +9,17 @@ double* allocateDoubleArray(int N) {
     return x;
 }
 
+double** allocateDoubleArray_rows(int N1, int N2, double* x_row) {
+    // N1- number of rows   N2-length of each row
+    double** x = (double**)calloc(N1, sizeof(double*));
+    if (x == NULL) {
+        perror("allocateDoubleArray_rows");
+        exit(1);
+    }
+    for (int i = 0; i < N1; i++) x[i] = &x_row[N2 * i];
+    return x;
+}
+
 void writeDataToFile(const char *filename, int time_steps, double dt, double *y1, double *y2) {
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
@@ -21,7 +32,7 @@ void writeDataToFile(const char *filename, int time_steps, double dt, double *y1
 
     // Write the data rows
     for (int i = 0; i < time_steps; i++) {
-        fprintf(file, "%.3f,%.6f,%.6f\n", i*dt, *(y1+i), *(y2+i));
+        fprintf(file, "%.3f,%.6f,%.6f\n", i*dt, y1[i], y2[i]);
     }
 
     // Close the file
