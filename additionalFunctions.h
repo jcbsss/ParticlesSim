@@ -15,7 +15,7 @@ double** allocateDoubleArray_rows(int N1, int N2, double* x_row);
 void writeDataToFile(const char *filename, int N, int time_steps, double dt, double **y1, double **y2);
 /*Prints it to file*/
 
-void initialize_positions(double** y1, double** y2, int N, double L1, double L2);
+void initialize_positions(double** y1, double** y2, int N, int N_1, double L1, double L2);
 /*Simple function to initialize initial positions*/
 
 #endif

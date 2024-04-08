@@ -7,26 +7,29 @@ disp(positions([1 end], :));
 
 % Read the data from the positions table
 time = positions.time;
-y1 = table2array(positions(1:5:end, 2:2:end)); % Convert y1 table to array
-y2 = table2array(positions(1:5:end, 3:2:end)); % Convert y2 table to array
+t_steps_jump = 5;
+y1 = table2array(positions(1:t_steps_jump:end, 2:2:end)); % Convert y1 table to array
+y2 = table2array(positions(1:t_steps_jump:end, 3:2:end)); % Convert y2 table to array
 
 % Plot the initial positions of particles
 figure;
 scatter(y1(1, :), y2(1, :), 10, 'filled');
-xlabel('y1 [m]'); xlim([0 7]);
-ylabel('y2 [m]'); ylim([0 7]);
+xlabel('y1 [m]'); xlim([0 2*pi]);
+ylabel('y2 [m]'); ylim([0 4*pi]);
+daspect([1 2 1]);
 title('Initial Positions of Particles');
 grid on;
 axis equal;
 
 % Loop through time steps and update the plot dynamically
 for i = 1:size(y1, 1)
-    scatter(y1(i, :), y2(i, :), 10, 'filled');
-    xlabel('y1 [m]'); xlim([0 7]);
-    ylabel('y2 [m]'); ylim([0 7]);
-    title(['Positions of Particles at t = ', num2str(time(i)), 's']);
+    scatter(y1(i, :), y2(i, :), 7, 'filled');
+    xlabel('y1 [m]'); xlim([0 2*pi]);
+    ylabel('y2 [m]'); ylim([0 4*pi]);
+    daspect([1 2 1]);
+    title(['Positions of Particles at t = ', num2str(time(i*t_steps_jump)), 's']);
     grid on;
     axis equal;
-    pause(0.001); % Adjust the pause time as needed for desired animation speed
+    pause(0.02); % Adjust the pause time as needed for desired animation speed
 end
 
