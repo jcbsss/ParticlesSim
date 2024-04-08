@@ -16,11 +16,11 @@ main() {
     double L1=2*PI, L2=2*PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time = 15; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time = 25; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.01; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 16; //The number of particles
+    int N = 60; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
