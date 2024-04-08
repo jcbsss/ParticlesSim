@@ -16,8 +16,8 @@ main() {
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time = 100; //Choose the duration //Don't choose it to long, because the file will be huge
-    double dt = 0.01; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
+    double end_time = 30; //Choose the duration //Don't choose it to long, because the file will be huge
+    double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
     int N = 400*2; //The number of particles
