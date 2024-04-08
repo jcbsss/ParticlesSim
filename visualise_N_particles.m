@@ -9,7 +9,7 @@ positions = readtable('positions_ParticleSim.csv');
 
 % Read the data from the positions table
 time = positions.time;
-t_steps_jump = 5;
+t_steps_jump = 3;
 y1 = table2array(positions(1:t_steps_jump:end, 2:2:end)); % Convert y1 table to array
 y2 = table2array(positions(1:t_steps_jump:end, 3:2:end)); % Convert y2 table to array
 
@@ -17,7 +17,8 @@ y2 = table2array(positions(1:t_steps_jump:end, 3:2:end)); % Convert y2 table to 
 L1 = 2*pi;
 L2 = 4*pi;
 part_size = 5;
-animation_name = 'animation_A5_W.5_U1.5.mp4';
+animation_name = 'animation_A2_W.5_U1.5.mp4';
+frame_rate = 30;
 
 % Plot the initial positions of particles
 figure('Position', [0, 0, L1/pi*256, L2/pi*256]);
@@ -38,7 +39,7 @@ switch choice
         play_animation(y1, y2, time, animation_name, t_steps_jump, part_size, L1, L2);
     case 2
         % Save animation
-        save_animation(y1, y2, time, animation_name, t_steps_jump, part_size, L1, L2);
+        save_animation(y1, y2, time, animation_name, t_steps_jump, part_size, L1, L2, frame_rate);
     otherwise
         disp('Invalid choice.');
 end
@@ -57,10 +58,10 @@ function play_animation(y1, y2, time, ~, t_steps_jump, part_size, L1, L2)
     end
 end
 
-function save_animation(y1, y2, time, animation_name, t_steps_jump, part_size, L1, L2)
+function save_animation(y1, y2, time, animation_name, t_steps_jump, part_size, L1, L2, frame_rate)
     % Create a video writer object
     writerObj = VideoWriter(animation_name, 'MPEG-4');
-    writerObj.FrameRate = 15; % Set the frame rate (adjust as needed)
+    writerObj.FrameRate = frame_rate; % Set the frame rate (adjust as needed)
     open(writerObj);
 
     % Loop through time steps and update the plot dynamically
