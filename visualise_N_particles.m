@@ -17,7 +17,7 @@ y2 = table2array(positions(1:t_steps_jump:end, 3:2:end)); % Convert y2 table to 
 L1 = 2*pi;
 L2 = 4*pi;
 part_size = 5;
-animation_name = 'animation_A2_W.5_U1.5.mp4';
+animation_name = 'animation_A2_W.5_U1.5_R.95.mp4';
 frame_rate = 30;
 
 % Plot the initial positions of particles

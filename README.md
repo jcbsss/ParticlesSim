@@ -1,4 +1,4 @@
-This is a munerical simulation project done for the Geophysical Laboratory I in the University of Warsaw. 
+This is a numerical simulation project done for the Geophysical Laboratory I in the University of Warsaw. 
 
 It is done accordingly to the paper: "The motion of small spherical particles in a cellular flow field" M. R. Maxey
 
@@ -7,9 +7,4 @@ Additional task is to optimize the code and use paralelization. I'm still learni
 
 This is my main part of a programme where I extend the basic simulation from 1 particle to miltiple particles. It is supposed to be optimized and parallelized.
 
-
-
-Remarks
-IMPROVE: initial positions function
-EDIT: matlab code
-ADD and RETHINK: some statistical functionalities
+I uploaded some examplous resulting videos.

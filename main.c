@@ -12,11 +12,11 @@ main() {
     double A = 5; //Inertia parameter
     double W = 0.5; //Settling velocity parameter
     double U_0 = 1.5; //[m/s] //Max flow speed
-    double R = 0.3; //Mass ration
+    double R = 0.95; //Mass ration
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time = 30; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time =  100; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
@@ -46,8 +46,15 @@ main() {
         v1[j] = v1[j] + a1[j]*dt;
         v2[j] = v2[j] + a2[j]*dt;
 
-        a1[j] = A*(U_0*sin(y1[j][i+1])*cos(y2[j][i+1])-v1[j]);
-        a2[j] = A*(-U_0*cos(y1[j][i+1])*sin(y2[j][i+1])-v2[j] - W);
+        //a1[j] = A*(U_0*sin(y1[j][i+1])*cos(y2[j][i+1])-v1[j]);
+        //a2[j] = A*(-U_0*cos(y1[j][i+1])*sin(y2[j][i+1])-v2[j] - W);
+
+        a1[j] = A * (-v1[j] + sin(y1[j][i+1]) * cos(y2[j][i+1]) 
+                      + 0.5 * R / A * (v1[j] * cos(y1[j][i+1]) * cos(y2[j][i+1]) - v2[j] * sin(y1[j][i+1]) * sin(y2[j][i+1])) 
+                      + R / A * sin(y1[j][i+1]) * cos(y1[j][i+1]));
+        a2[j] = A * (-v2[j] - sin(y2[j][i+1]) * cos(y1[j][i+1]) - W
+                      + 0.5 * R / A * (v1[j] * sin(y1[j][i+1]) * sin(y2[j][i+1]) - v2[j] * cos(y1[j][i+1]) * cos(y2[j][i+1])) 
+                      + R / A * sin(y2[j][i+1]) * cos(y2[j][i+1]));
 
         if (y1[j][i+1] > L1) y1[j][i+1] -= L1; //The functionality of a periodic boundary conditions
         if (y1[j][i+1] < 0) y1[j][i+1] += L1;
