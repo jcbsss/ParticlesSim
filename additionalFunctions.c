@@ -62,3 +62,21 @@ void initialize_positions(double** y1, double** y2, int N, int N_1, double L1, d
         }
     }
 } 
+
+void calculate_accelerations(int field, double* a1, double* a2, double v1, double v2, double y1, double y2, double U_0, double A, double R, double W) {
+    switch (field){
+        case 1: //The main formula for the purpose of this tutorial. The velocity field is called Taylor-Green circulations
+        *a1 = A*(U_0*sin(y1)*cos(y2)-v1);
+        *a2 = A*(-U_0*cos(y1)*sin(y2)-v2 - W);
+        break;
+
+        case 2: //The formula derived in maxey 1987 paper for the given velocity field
+        *a1 = A * (-v1 + sin(y1) * cos(y2)
+                + 0.5 * R / A * (v1 * cos(y1) * cos(y2) - v2 * sin(y1) * sin(y2))
+                + R / A * sin(y1) * cos(y1));
+        *a2 = A * (-v2 - sin(y2) * cos(y1) - W
+                + 0.5 * R / A * (v1 * sin(y1) * sin(y2) - v2 * cos(y1) * cos(y2))
+                + R / A * sin(y2) * cos(y2));
+        break;   
+    }
+}

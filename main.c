@@ -46,15 +46,20 @@ main() {
         v1[j] = v1[j] + a1[j]*dt;
         v2[j] = v2[j] + a2[j]*dt;
 
+        calculate_accelerations(2, &a1[j], &a2[j], v1[j], v2[j], y1[j][i+1], y2[j][i+1], U_0, A, R, W);
+        /*The first variable in a function is a choice of velocity field, based on which, the acceleration is calculated. Choose wisely:
+        1- Taylor-Green circulations
+        2- More advanced Taylor-Green circulations (from maxey1987 article)
+        3- TBC... Some turbulent field*/
+
         //a1[j] = A*(U_0*sin(y1[j][i+1])*cos(y2[j][i+1])-v1[j]);
         //a2[j] = A*(-U_0*cos(y1[j][i+1])*sin(y2[j][i+1])-v2[j] - W);
-
-        a1[j] = A * (-v1[j] + sin(y1[j][i+1]) * cos(y2[j][i+1]) 
+        /*a1[j] = A * (-v1[j] + sin(y1[j][i+1]) * cos(y2[j][i+1]) 
                       + 0.5 * R / A * (v1[j] * cos(y1[j][i+1]) * cos(y2[j][i+1]) - v2[j] * sin(y1[j][i+1]) * sin(y2[j][i+1])) 
                       + R / A * sin(y1[j][i+1]) * cos(y1[j][i+1]));
         a2[j] = A * (-v2[j] - sin(y2[j][i+1]) * cos(y1[j][i+1]) - W
                       + 0.5 * R / A * (v1[j] * sin(y1[j][i+1]) * sin(y2[j][i+1]) - v2[j] * cos(y1[j][i+1]) * cos(y2[j][i+1])) 
-                      + R / A * sin(y2[j][i+1]) * cos(y2[j][i+1]));
+                      + R / A * sin(y2[j][i+1]) * cos(y2[j][i+1]));*/
 
         if (y1[j][i+1] > L1) y1[j][i+1] -= L1; //The functionality of a periodic boundary conditions
         if (y1[j][i+1] < 0) y1[j][i+1] += L1;
@@ -66,7 +71,7 @@ main() {
     printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
 
     /*Write the positions to file*/
-    writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);
+    //writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);
 
     /*Clear the space*/
     free(y1); free(y2);
