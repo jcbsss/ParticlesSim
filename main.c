@@ -3,11 +3,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
 
-main() {
+int main() {
+    /* Variables to store the start and end times */
+    clock_t start, end;
+    double cpu_time_used;
+
+    /* Start time */
+    start = clock();
+
    /*Flow parameters*/
     double A = 5; //Inertia parameter
     double W = 0.5; //Settling velocity parameter
@@ -16,11 +24,11 @@ main() {
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time =  100; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time =  500; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 400*2; //The number of particles
+    int N = 1000*2; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
@@ -60,6 +68,13 @@ main() {
     }
 
     printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
+
+    /* End time */
+    end = clock();
+
+    /* Calculate the time used */
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+    printf("Execution time: %f s \n", cpu_time_used);
 
     /*Write the positions to file*/
     //writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);

@@ -1,10 +1,17 @@
-This is a numerical simulation project done for the Geophysical Laboratory I in the University of Warsaw. 
+This is the branch, where I conduct some tests on efficiency of the programm. There are a few scenarios, which will let me compare various versions of the code (stadard, optimized, paralellized)
 
-It is done accordingly to the paper: "The motion of small spherical particles in a cellular flow field" M. R. Maxey
 
-The aim is to conduct a simulation of aerosol parcticles moving in a steady circular flow field. There will be gathered some statistics concerning particles' movement. 
-Additional task is to optimize the code and use paralelization. I'm still learning Git
+CODE VARIANTS:
+1. Standard: outer loop(timesteps) inner loop(Particles)
+2. Standard: inner loop(Particles) outer loop(timesteps)
+3. NoSaving: faster variant of the loop; The functionality of saving all the positions is disabled. Instead the statistics will be calculated in real time
+4. NoSaving - Parallelized: faster variant of the loop; the code variant with no positions saving; parallelized
 
-This is my main part of a programme where I extend the basic simulation from 1 particle to miltiple particles. It is supposed to be optimized and parallelized.
+SIMULATION CASES:
+A. Many particles, short time: end_time =  25; N = 100000*2;
+B. Few particles, long time: end_time = 1000; N = 1000*2;
+C. Medium particles, medium time: end_time =  100; N = 10000*2;
 
-I uploaded some examplous resulting videos.
+The saving is diasbled, so the pure speed of the simulation is tested. Saving the particles' positions in each step is really costly!
+
+There will be used formulation of acceleration n.o. 2 (more advanced, more operationss)
