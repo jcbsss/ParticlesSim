@@ -52,15 +52,6 @@ main() {
         2- More advanced Taylor-Green circulations (from maxey1987 article)
         3- TBC... Some turbulent field*/
 
-        //a1[j] = A*(U_0*sin(y1[j][i+1])*cos(y2[j][i+1])-v1[j]);
-        //a2[j] = A*(-U_0*cos(y1[j][i+1])*sin(y2[j][i+1])-v2[j] - W);
-        /*a1[j] = A * (-v1[j] + sin(y1[j][i+1]) * cos(y2[j][i+1]) 
-                      + 0.5 * R / A * (v1[j] * cos(y1[j][i+1]) * cos(y2[j][i+1]) - v2[j] * sin(y1[j][i+1]) * sin(y2[j][i+1])) 
-                      + R / A * sin(y1[j][i+1]) * cos(y1[j][i+1]));
-        a2[j] = A * (-v2[j] - sin(y2[j][i+1]) * cos(y1[j][i+1]) - W
-                      + 0.5 * R / A * (v1[j] * sin(y1[j][i+1]) * sin(y2[j][i+1]) - v2[j] * cos(y1[j][i+1]) * cos(y2[j][i+1])) 
-                      + R / A * sin(y2[j][i+1]) * cos(y2[j][i+1]));*/
-
         if (y1[j][i+1] > L1) y1[j][i+1] -= L1; //The functionality of a periodic boundary conditions
         if (y1[j][i+1] < 0) y1[j][i+1] += L1;
         if (y2[j][i+1] > L2) y2[j][i+1] -= L2;
