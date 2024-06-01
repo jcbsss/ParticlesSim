@@ -1,9 +1,10 @@
-/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm; ./ParticleSim */
+/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm -fopenmp -o3; ./ParticleSim */
 //#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <omp.h>
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
@@ -24,18 +25,18 @@ int main() {
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time =  500; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time =  200; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 1000*2; //The number of particles
+    int N = 100000; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
     double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
     double* y2_row = allocateDoubleArray(N*time_steps);
     double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
-    initialize_positions(y1, y2, N, 20, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
+    initialize_positions(y1, y2, N, 100, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
 
   /*Defining particles' initial velocities and accelerations*/
     double* v1 = allocateDoubleArray(N); //Defining of the particle's initial speeds and accelerations 
@@ -43,9 +44,10 @@ int main() {
     double* a1 = allocateDoubleArray(N);
     double* a2 = allocateDoubleArray(N);
 
-  /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function (?)
+  /*Euler scheme solving the differential equation*/
     for (int i = 0; i < time_steps; ++i) //iterate over each timestep
     {
+      #pragma omp parallel for
       for (int j = 0; j < N; ++j) //iterate over each particle
       {  
         y1[j][i+1] = y1[j][i] + v1[j]*dt;
