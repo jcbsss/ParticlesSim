@@ -49,19 +49,19 @@ void writeDataToFile(const char *filename, int N, int time_steps, double dt, dou
     printf("Data written to %s\n\n", filename);
 }
 
-void initialize_positions(double** y1, double** y2, int N, int N_1, double L1, double L2) {
+void initialize_positions_single(double* y1_current, double* y2_current, int N, int N_1, double L1, double L2) {
     int N_2 = N / N_1; // Number of particles in direction 2
     double dy_1 = L1 / N_1; // Spacing along the x-axis
     double dy_2 = L2 / N_2; // Spacing along the y-axis
 
     for (int i = 0; i < N_1; i++) {
         for (int j = 0; j < N_2; j++) {
-            int part_index = i*N_2+j; // Calculating the particle index
-            y1[part_index][0] = dy_1 * (1/2 + i);
-            y2[part_index][0] = dy_2 * (1/2 + j);
+            int part_index = i * N_2 + j; // Calculating the particle index
+            y1_current[part_index] = dy_1 * (0.5 + i);
+            y2_current[part_index] = dy_2 * (0.5 + j);
         }
     }
-} 
+}
 
 void calculate_accelerations(int field, double* a1, double* a2, double v1, double v2, double y1, double y2, double U_0, double A, double R, double W) {
     switch (field){

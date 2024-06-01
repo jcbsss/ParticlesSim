@@ -1,5 +1,4 @@
-/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm -fopenmp -o3; ./ParticleSim */
-//#define _CRT_SECURE_NO_WARNINGS
+// #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -7,7 +6,6 @@
 #include <omp.h>
 #include "additionalFunctions.h"
 #define PI 3.14159265
-
 
 int main() {
     /* Variables to store the start and end times */
@@ -17,59 +15,69 @@ int main() {
     /* Start time */
     start = clock();
 
-   /*Flow parameters*/
-    double A = 5; //Inertia parameter
-    double W = 0.5; //Settling velocity parameter
-    double U_0 = 1.5; //[m/s] //Max flow speed
-    double R = 0.95; //Mass ration
-    double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
+    /* Flow parameters */
+    double A = 5; // Inertia parameter
+    double W = 0.5; // Settling velocity parameter
+    double U_0 = 1.5; // [m/s] Max flow speed
+    double R = 0.95; // Mass ratio
+    double L1 = 2 * PI, L2 = 4 * PI; // [m] Domain size
 
-  /*Simulation Parameters*/
-    double end_time =  200; //Choose the duration //Don't choose it to long, because the file will be huge
-    double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
-    //I don't know why "0.01/U_0" do not work. Something with allocation
-    int time_steps = end_time/dt; // The number of time steps
-    int N = 100000; //The number of particles
+    /* Simulation Parameters */
+    double end_time = 100; // Choose the duration
+    double dt = 0.05; // Choose the timestep
+    int time_steps = end_time / dt; // The number of time steps
+    int N = 10000 * 10000; // The number of particles
 
-  /*Defining particles' initial coordinates*/
-    double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
-    double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
-    double* y2_row = allocateDoubleArray(N*time_steps);
-    double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
-    initialize_positions(y1, y2, N, 100, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
+    /* Defining particles' initial coordinates */
+    double* y1_current = allocateDoubleArray(N); // Particles' current coordinates
+    double* y2_current = allocateDoubleArray(N);
+    double* y1_next = allocateDoubleArray(N); // Particles' next coordinates
+    double* y2_next = allocateDoubleArray(N);
+    initialize_positions_single(y1_current, y2_current, N, 10000, L1, L2); // Initialize current positions
 
-  /*Defining particles' initial velocities and accelerations*/
-    double* v1 = allocateDoubleArray(N); //Defining of the particle's initial speeds and accelerations 
-    double* v2 = allocateDoubleArray(N); //calloc function already initialized 0 values everywhere
+    /* Defining particles' initial velocities and accelerations */
+    double* v1 = allocateDoubleArray(N); // Defining the particles' initial speeds and accelerations 
+    double* v2 = allocateDoubleArray(N); // calloc function already initialized 0 values everywhere
     double* a1 = allocateDoubleArray(N);
     double* a2 = allocateDoubleArray(N);
 
-  /*Euler scheme solving the differential equation*/
-    for (int i = 0; i < time_steps; ++i) //iterate over each timestep
+    double total_v2_sum = 0.0; // To accumulate the sum of v2 for average calculation
+
+    /* Euler scheme solving the differential equation */
+    for (int i = 0; i < time_steps; ++i) // Iterate over each timestep
     {
-      #pragma omp parallel for
-      for (int j = 0; j < N; ++j) //iterate over each particle
-      {  
-        y1[j][i+1] = y1[j][i] + v1[j]*dt;
-        y2[j][i+1] = y2[j][i] + v2[j]*dt;
+        #pragma omp parallel for reduction(+:total_v2_sum) schedule(static)
+        for (int j = 0; j < N; ++j) // Iterate over each particle
+        {  
+            y1_next[j] = y1_current[j] + v1[j] * dt;
+            y2_next[j] = y2_current[j] + v2[j] * dt;
 
-        v1[j] = v1[j] + a1[j]*dt;
-        v2[j] = v2[j] + a2[j]*dt;
+            v1[j] = v1[j] + a1[j] * dt;
+            v2[j] = v2[j] + a2[j] * dt;
 
-        calculate_accelerations(2, &a1[j], &a2[j], v1[j], v2[j], y1[j][i+1], y2[j][i+1], U_0, A, R, W);
-        /*The first variable in a function is a choice of velocity field, based on which, the acceleration is calculated. Choose wisely:
-        1- Taylor-Green circulations
-        2- More advanced Taylor-Green circulations (from maxey1987 article)
-        3- TBC... Some turbulent field*/
+            calculate_accelerations(2, &a1[j], &a2[j], v1[j], v2[j], y1_next[j], y2_next[j], U_0, A, R, W);
 
-        if (y1[j][i+1] > L1) y1[j][i+1] -= L1; //The functionality of a periodic boundary conditions
-        if (y1[j][i+1] < 0) y1[j][i+1] += L1;
-        if (y2[j][i+1] > L2) y2[j][i+1] -= L2;
-        if (y2[j][i+1] < 0) y2[j][i+1] += L2;
-      }
+            if (y1_next[j] > L1) y1_next[j] -= L1; // Periodic boundary conditions
+            if (y1_next[j] < 0) y1_next[j] += L1;
+            if (y2_next[j] > L2) y2_next[j] -= L2;
+            if (y2_next[j] < 0) y2_next[j] += L2;
+
+            total_v2_sum += v2[j]; // Accumulate the sum of v2
+        }
+
+        // Swap current and next positions for the next timestep
+        double* temp_y1 = y1_current;
+        double* temp_y2 = y2_current;
+        y1_current = y1_next;
+        y2_current = y2_next;
+        y1_next = temp_y1;
+        y2_next = temp_y2;
     }
 
-    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0,  end_time, dt, time_steps);
+    double average_v2 = total_v2_sum / (N * time_steps); // Calculate the overall average velocity v2
+
+    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0, end_time, dt, time_steps);
+    printf("Overall average velocity v2: %f\n", average_v2);
 
     /* End time */
     end = clock();
@@ -78,12 +86,9 @@ int main() {
     cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
     printf("Execution time: %f s \n", cpu_time_used);
 
-    /*Write the positions to file*/
-    //writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);
-
-    /*Clear the space*/
-    free(y1); free(y2);
-    free(y1_row); free(y2_row);
+    /* Clear the space */
+    free(y1_current); free(y2_current);
+    free(y1_next); free(y2_next);
     free(v1); free(v2);
     free(a1); free(a2);
 
