@@ -6,6 +6,19 @@
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
+inline void apply_periodic_boundary(double* y1, double* y2, double L1, double L2) {
+    if (*y1 > L1) {
+        *y1 -= L1;
+    } else if (*y1 < 0) {
+        *y1 += L1;
+    }
+    if (*y2 > L2) {
+        *y2 -= L2;
+    } else if (*y2 < 0) {
+        *y2 += L2;
+    }
+}
+
 int main() {
     /* Variables to store the start and end times */
     double start, end;
@@ -25,7 +38,7 @@ int main() {
     double end_time = 200; // Choose the duration
     double dt = 0.05; // Choose the timestep
     int time_steps = end_time / dt; // The number of time steps
-    int N = 100000; // The number of particles
+    int N = 10000; // The number of particles
 
     /* Defining particles' initial coordinates */
     double* y1_row = allocateDoubleArray(N * time_steps); // Particles' coordinates allocation in an efficient way
@@ -58,10 +71,7 @@ int main() {
            2- More advanced Taylor-Green circulations (from maxey1987 article)
            3- TBC... Some turbulent field */
 
-            if (y1[j][i+1] > L1) y1[j][i+1] -= L1; // The functionality of a periodic boundary condition
-            if (y1[j][i+1] < 0) y1[j][i+1] += L1;
-            if (y2[j][i+1] > L2) y2[j][i+1] -= L2;
-            if (y2[j][i+1] < 0) y2[j][i+1] += L2;
+            apply_periodic_boundary(&y1[j][i+1], &y2[j][i+1], L1, L2); // Apply periodic boundary conditions
         }
     }
 
@@ -70,9 +80,8 @@ int main() {
 
     /* Calculate the time used */
     cpu_time_used = end - start;
-    printf("Execution time: %f s \n", cpu_time_used);
 
-    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0, end_time, dt, time_steps);
+    printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\nExecution time: %f s \n", A, W, U_0, end_time, dt, time_steps, cpu_time_used);
 
     /* Write the positions to file */
     // writeDataToFile("positions_ParticleSim.csv", N, time_steps, dt, y1, y2);
