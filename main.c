@@ -29,23 +29,23 @@ int main() {
 
     /* Flow parameters */
     double A = 5; // Inertia parameter
-    double W = 0.5; // Settling velocity parameter
+    double W = 2; // Settling velocity parameter
     double U_0 = 1.5; // [m/s] Max flow speed
     double R = 0.95; // Mass ratio
     double L1 = 2 * PI, L2 = 4 * PI; // [m] Domain size
 
     /* Simulation Parameters */
-    double end_time = 200; // Choose the duration
+    double end_time = 20; // Choose the duration
     double dt = 0.05; // Choose the timestep
     int time_steps = end_time / dt; // The number of time steps
-    int N = 10000; // The number of particles
+    int N = 1000*1000; // The number of particles
 
     /* Defining particles' initial coordinates */
     double* y1_row = allocateDoubleArray(N * time_steps); // Particles' coordinates allocation in an efficient way
     double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
     double* y2_row = allocateDoubleArray(N * time_steps);
     double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
-    initialize_positions(y1, y2, N, 100, L1, L2); // Needs improvement
+    initialize_positions(y1, y2, N, 1000, L1, L2); // Needs improvement
 
     /* Defining particles' initial velocities and accelerations */
     double* v1 = allocateDoubleArray(N); // Defining the particles' initial speeds and accelerations 
@@ -56,7 +56,7 @@ int main() {
     /* Euler scheme solving the differential equation */
     for (int i = 0; i < time_steps; ++i) // Iterate over each timestep
     {
-        #pragma omp parallel for
+        #pragma omp parallel for schedule(guided) //schedule (static/dynamic/guided) for better performance
         for (int j = 0; j < N; ++j) // Iterate over each particle
         {  
             y1[j][i+1] = y1[j][i] + v1[j] * dt;
