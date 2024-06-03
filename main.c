@@ -3,11 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
+#include <omp.h>
 #include "additionalFunctions.h"
 #define PI 3.14159265
 
 
-main() {
+int main() {
+    /* Variables to store the start and end times */
+    double start, end;
+    double cpu_time_used;
+
+    /* Start time */
+    start = omp_get_wtime();
+
    /*Flow parameters*/
     double A = 5; //Inertia parameter
     double W = 0.5; //Settling velocity parameter
@@ -16,18 +25,18 @@ main() {
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time =  100; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time =  50; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 400*2; //The number of particles
+    int N = 220*220; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
     double** y1 = allocateDoubleArray_rows(N, time_steps, y1_row);
     double* y2_row = allocateDoubleArray(N*time_steps);
     double** y2 = allocateDoubleArray_rows(N, time_steps, y2_row);
-    initialize_positions(y1, y2, N, 20, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
+    initialize_positions(y1, y2, N, 50, L1, L2); //NEEEEEEDS AN IMPROVEMENT!!!!
 
   /*Defining particles' initial velocities and accelerations*/
     double* v1 = allocateDoubleArray(N); //Defining of the particle's initial speeds and accelerations 
@@ -38,6 +47,7 @@ main() {
   /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function (?)
     for (int i = 0; i < time_steps; ++i) //iterate over each timestep
     {
+      #pragma omp parallel for schedule(guided)
       for (int j = 0; j < N; ++j) //iterate over each particle
       {  
         y1[j][i+1] = y1[j][i] + v1[j]*dt;
@@ -63,6 +73,11 @@ main() {
 
     /*Write the positions to file*/
     //writeDataToFile("positions_ParticleSim.csv",N,time_steps,dt,y1,y2);
+
+    end = omp_get_wtime(); // End time
+
+    cpu_time_used = end - start; //Calcuate and print time used
+    printf("Execution time: %f s \n", cpu_time_used);
 
     /*Clear the space*/
     free(y1); free(y2);
