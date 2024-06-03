@@ -23,14 +23,14 @@ int main() {
     start = omp_get_wtime();
 
     /* Flow parameters */
-    const double A = 5; // Inertia parameter
+    const double A = 2; // Inertia parameter
     const double W = 0.5; // Settling velocity parameter
     const double U_0 = 1.5; // [m/s] Max flow speed
-    const double R = 0.95; // Mass ratio
+    const double R = 0; // Mass ratio
     const double L1 = 2 * PI, L2 = 4 * PI; // [m] Domain size
 
     /* Simulation Parameters */
-    const double end_time = 100; // Choose the duration
+    const double end_time = 200; // Choose the duration
     const double dt = 0.05; // Choose the timestep
     const int time_steps = end_time / dt; // The number of time steps
     const int N = 1000 * 1000; // The number of particles
@@ -50,6 +50,9 @@ int main() {
 
     double total_v2_sum = 0.0; // To accumulate the sum of v2 for average calculation
 
+    /* Define the timestep threshold */
+    int timestep_threshold = 1500; // choose, from which time step start computingthe average
+
     /* Euler scheme solving the differential equation */
     for (int i = 0; i < time_steps; ++i) // Iterate over each timestep
     {
@@ -67,7 +70,10 @@ int main() {
             periodic_boundary(&y1_next[j], L1);
             periodic_boundary(&y2_next[j], L2);
 
-            total_v2_sum += v2[j]; // Accumulate the sum of v2
+            /* Only accumulate v2 if the current timestep is beyond the threshold */
+            if (i >= timestep_threshold) {
+                total_v2_sum += v2[j]; // Accumulate the sum of v2
+            }
         }
 
         // Swap current and next positions for the next timestep
@@ -79,7 +85,8 @@ int main() {
         y2_next = temp_y2;
     }
 
-    double average_v2 = total_v2_sum / ((long long)N * (long long)time_steps); // Calculate the overall average settling velocity
+    int effective_time_steps = time_steps - timestep_threshold;
+    double average_v2 = total_v2_sum / ((long long)N * (long long)effective_time_steps); // Calculate the overall average settling velocity
 
     printf("\n.....Calculation complete..... \nParameters used: A=%.2lf, W=%.2lf, U_0=%.1lf \nTime=%.2lf, dT=%.5lf, n.o.TimeSteps=%d\n", A, W, U_0, end_time, dt, time_steps);
     printf("Overall average velocity v2: %f\n", average_v2);
