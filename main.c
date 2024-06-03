@@ -1,4 +1,4 @@
-/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm; ./ParticleSim */
+/*Compile with: gcc -o ParticleSim main.c additionalFunctions.c -lm -fopenmp -O3;; ./ParticleSim */
 //#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,11 +25,11 @@ int main() {
     double L1 = 2 * PI, L2 = 4 * PI; //[m] //Domain size
 
   /*Simulation Parameters*/
-    double end_time =  50; //Choose the duration //Don't choose it to long, because the file will be huge
+    double end_time =  1000; //Choose the duration //Don't choose it to long, because the file will be huge
     double dt = 0.05; //Choose the timestep //The factor 0.01 should be quite precise. Factor 0.1 will work somehow
     //I don't know why "0.01/U_0" do not work. Something with allocation
     int time_steps = end_time/dt; // The number of time steps
-    int N = 220*220; //The number of particles
+    int N = 50*50; //The number of particles
 
   /*Defining particles' initial coordinates*/
     double* y1_row = allocateDoubleArray(N*time_steps); //Particles' coordinates allocation in an effecient way
@@ -44,11 +44,11 @@ int main() {
     double* a1 = allocateDoubleArray(N);
     double* a2 = allocateDoubleArray(N);
 
-  /*Euler scheme solving the differential equation*/ //There is a chance to place it inside a function (?)
-    for (int i = 0; i < time_steps; ++i) //iterate over each timestep
-    {
-      #pragma omp parallel for schedule(guided)
+  /*Euler scheme solving the differential equation*/
+    #pragma omp parallel for schedule(guided)
       for (int j = 0; j < N; ++j) //iterate over each particle
+    {
+      for (int i = 0; i < time_steps; ++i) //iterate over each timestep
       {  
         y1[j][i+1] = y1[j][i] + v1[j]*dt;
         y2[j][i+1] = y2[j][i] + v2[j]*dt;
